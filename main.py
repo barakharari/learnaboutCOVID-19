@@ -1,3 +1,5 @@
 import info as info
 
-print(info.getUSInformation())
+info.getUSInformation()
+info.getStateInformation("California")
+info.getCountyInformation("New York", "Genesee")

@@ -1,12 +1,13 @@
 import csv
 import datetime
+import utilities as uts
 
+yesterday = str(datetime.date.today() - datetime.timedelta(days=1))
+dayBefore = str(datetime.date.today() - datetime.timedelta(days=2))
 
 def getUSInformation():
-    yesterday = str(datetime.date.today() - datetime.timedelta(days=1))
-    dayBefore = str(datetime.date.today() - datetime.timedelta(days=2))
+
     usRates = []
-    usDataMessage = ""
 
     with open('./covid-19-data/us.csv') as usCSV:
         reader = csv.reader(usCSV, delimiter = ',')
@@ -14,22 +15,32 @@ def getUSInformation():
             if str(line[0]) == dayBefore or str(line[0]) == yesterday:
                 usRates.append((int(line[1]), int(line[2])))
 
+    print(uts.updateStringWithRates("The rate of recorded coronavirus cases across the nation has ", usRates))
+    uts.numberOfCasesAndDeathsAsOf(yesterday, usRates[1][0], usRates[1][1])
 
-    if len(usRates) == 2:
-        usDataMessage = "The rate of recorded coronavirus cases across the nation has "
-        rate = "{:.2f}".format(round((usRates[1][0] - usRates[0][0]) * 100 / usRates[0][0], 2))
-        if usRates[0][0] > usRates[1][0]:
-             usDataMessage += "dropped by " + rate + "% "
-        elif usRates[0][0] < usRates[1][0]:
-             usDataMessage += "risen by " + rate + "% "
-        else:
-            usDataMessage += "not changed "
+def getStateInformation(state):
 
-        usDataMessage += "since yesterday"
-    else:
-        usDataMessage = "Sorry, we cannot give accurate coronavirus data at this moment"
+    stateRates = []
+
+    with open('./covid-19-data/us-states.csv') as statesCSV:
+        reader = csv.reader(statesCSV, delimiter = ',')
+        for line in reader:
+            if (str(line[0]) == dayBefore or str(line[0]) == yesterday) and str(line[1]) == state:
+                stateRates.append((int(line[3]), int(line[4])))
+
+    print(uts.updateStringWithRates("The rate of recorded coronavirus cases in " + state + " has ", stateRates))
+    uts.numberOfCasesAndDeathsAsOf(yesterday, stateRates[1][0], stateRates[1][1])
 
 
-    return usDataMessage
+def getCountyInformation(state, county):
 
-# def getStateInformation():
+    countyRates = []
+
+    with open('./covid-19-data/us-counties.csv') as countyCSV:
+        reader = csv.reader(countyCSV, delimiter = ',')
+        for line in reader:
+            if (str(line[0]) == dayBefore or str(line[0]) == yesterday) and str(line[2]) == state and str(line[1]) == county:
+                countyRates.append((int(line[4]), int(line[5])))
+
+    print(uts.updateStringWithRates("The rate of recorded coronavirus cases in " + county + ", " + state + " has ", countyRates))
+    uts.numberOfCasesAndDeathsAsOf(yesterday, countyRates[1][0], countyRates[1][1])
