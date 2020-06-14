@@ -1,39 +1,63 @@
 import info as info
-import random
-import requests
-import json
-import handleInput as hI
-from twilio.rest import Client
+import utilities as ut
 
-input = "How many cases in Broome, New York?"
+userInput = None
+flag = False
 
-# processed = hI.processInput(input)
+def usage():
+    print()
+    print("  USAGE:")
+    print("\tFor US information type: 'US'")
+    print("\tFor state information type: '<state>'")
+    print("\tFor county information type: '<state>, <county>'")
+    print("\tFor random coronavirus fact type: 'FF'")
+    print("\tFor NYTimes article regarding coronavirus type: 'NYT'")
+    print("\tType 'exit' to exit program")
+    print("\tType 'options' to see these options again")
 
-#CASE/DEATH/RATE INFORMATION
-info.getUSInformation()
-info.getStateInformation("Ohio")
-info.getCountyInformation("Ohio", "Lorain")
+def handleInput(inp):
+    str = ""
+    inp = inp.split()
+    for i in inp: str += i.capitalize() + " "
+    return str.strip()
 
-#FUN FACTS
-with open('./covid19facts.txt') as funFacts:
-    factIndex = random.randint(1, 55)
-    info = []
-    index = 0
-    for line in funFacts:
-        if (index == factIndex):
-            info = line.split("~")
-            break
-        index += 1
-    print("'" + info[0] + "' - " + info[1].strip())
+usage()
 
-#NEWS ARTICLES
-requestUrl = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=covid19&api-key=Ot0YWlwrcfzzV9e0Zc7lA02D1bylRP4D"
-response = requests.get(requestUrl)
-json_data = json.loads(response.text)["response"]
+while(True):
+    print()
+    if not flag:
+        userInput = input("What do you wanna see today? ")
+        flag = True
+    else: userInput =  input("Anything else? ")
 
-randomArticleIndex = random.randint(0, len(json_data["docs"]))
+    userInput = userInput.split(',')
 
-articleAbstract = json_data["docs"][randomArticleIndex]["abstract"]
-articuleURL = json_data["docs"][randomArticleIndex]["web_url"]
+    if len(userInput) == 1:
+        text = userInput[0].lower()
+        if text == "exit": break
+        elif text == "options": usage()
+        elif text == "us":
+            print("\n----US INFORMATION----\n")
+            info.getUSInformation()
+        elif text == "ff":
+            print("\n----FUN FACT----\n")
+            ff = ut.getFunFact()
+            if ff is not None: print(ff)
+            else: print("Sorry, no fun fact available at this time")
+        elif text == "nyt":
+            print("\n----RANDOM ARTICLE----\n")
+            article = ut.getRandomArticle()
+            if article is not None:
+                print("HEADLINE: " + article[0])
+                print()
+                print("URL: " + article[1])
+                print()
+        else:
+            print("\n----" + userInput[0].upper().strip() + " INFORMATION----\n")
+            info.getStateInformation(handleInput(userInput[0]))
+    else:
+        print("\n----" + userInput[0].upper().strip() + "," + userInput[1].upper().strip() + " INFORMATION----\n")
 
-print(articleAbstract)
+
+
+        info.getCountyInformation(handleInput(userInput[0]), handleInput(userInput[1]))

@@ -38,10 +38,6 @@ def getStateInformation(state):
                 stateRates.insert(0, (int(line[3]), int(line[4])))
                 break
 
-    if mostRecentDate == None:
-        print("Sorry, state input is not valid, check your spelling!")
-        return
-
     print(uts.updateStringWithRates("The rate of recorded coronavirus cases in " + state + " has ", stateRates))
     uts.numberOfCasesAndDeathsAsOf(mostRecentDate, stateRates[1][0], stateRates[1][1])
 
@@ -62,10 +58,6 @@ def getCountyInformation(state, county):
             elif str(line[0]) != mostRecentDate and str(line[2]) == state and str(line[1]) == county:
                 countyRates.insert(0,(int(line[4]), int(line[5])))
                 break
-
-    if mostRecentDate == None:
-        print("State or country input is not valid, check your spelling!")
-        return
 
     print(uts.updateStringWithRates("The rate of recorded coronavirus cases in " + county + ", " + state + " has ", countyRates))
     uts.numberOfCasesAndDeathsAsOf(mostRecentDate, countyRates[1][0], countyRates[1][1])
